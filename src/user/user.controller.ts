@@ -10,13 +10,15 @@ import {
   Post,
   Request,
   UseGuards,
+  Query,
+  DefaultValuePipe 
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { Roles } from 'src/decorators/roles.decorators';
+import { Roles } from 'src/user/decorators/roles.decorators';
 
 @Controller('users')
 @UseGuards(AuthGuard, RolesGuard)  
@@ -26,9 +28,20 @@ export class UserController {
  // all routes admin only
   @Get()
   @Roles('admin')
-  findAll() {
-    return this.userService.findAll();
+  findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit: number,
+  ) {
+    return this.userService.findAll(page, limit);
   }
+
+  // search by email
+    @Get('search')
+    @Roles('admin')
+    search(@Query('email') email: string) {
+      if (!email) return [];
+      return this.userService.searchByEmail(email);
+    }
 
   // get /users/:id -> one user 
   @Get(':id')

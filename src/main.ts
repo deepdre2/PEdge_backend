@@ -7,7 +7,7 @@ async function bootstrap() {
 
   // allow next js to call api
   app.enableCors({
-    origin: ['http://localhost:3001'],   
+    origin: ['http://localhost:3000'],   
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,                  

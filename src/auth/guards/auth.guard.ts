@@ -7,10 +7,17 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { jwtConstants } from '../constants';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { RedisService } from 'src/redis/redis.service';
+
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+   private redis: RedisService,
+
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -19,6 +26,10 @@ export class AuthGuard implements CanActivate {
     if (!token) {
       throw new UnauthorizedException('No token provided');
     }
+    
+    // checks if blacklisted bcz token doesn't expire and can be resued 
+     const isBlacklisted = await this.redis.get(`blacklist:${token}`);
+    if (isBlacklisted) throw new UnauthorizedException('Token revoked');
 
     try {
       const payload = await this.jwtService.verifyAsync(token, {
