@@ -7,7 +7,9 @@ async function bootstrap() {
 
   // allow next js to call api
   app.enableCors({
-    origin: ['http://localhost:3000'],   
+    origin: ['http://localhost:3000',
+      'https://p-edge-frontend.vercel.app',
+    ],   
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,                  
